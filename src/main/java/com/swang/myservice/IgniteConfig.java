@@ -3,12 +3,11 @@ package com.swang.myservice;
 import org.apache.ignite.Ignite;
 import org.apache.ignite.Ignition;
 import org.apache.ignite.configuration.IgniteConfiguration;
+import org.apache.ignite.kubernetes.configuration.KubernetesConnectionConfiguration;
 import org.apache.ignite.spi.discovery.tcp.TcpDiscoverySpi;
-import org.apache.ignite.spi.discovery.tcp.ipfinder.multicast.TcpDiscoveryMulticastIpFinder;
+import org.apache.ignite.spi.discovery.tcp.ipfinder.kubernetes.TcpDiscoveryKubernetesIpFinder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.Arrays;
 
 @Configuration
 public class IgniteConfig {
@@ -20,15 +19,26 @@ public class IgniteConfig {
 
         // Configure discovery
         TcpDiscoverySpi discoverySpi = new TcpDiscoverySpi();
-        TcpDiscoveryMulticastIpFinder ipFinder = new TcpDiscoveryMulticastIpFinder();
 
-        // Replace with IPs of other replicas, or use Kubernetes IP Finder if in K8s
-        ipFinder.setAddresses(Arrays.asList("127.0.0.1:47500..47509"));
+        //multicast
+//        TcpDiscoveryMulticastIpFinder ipFinder = new TcpDiscoveryMulticastIpFinder();
+//        ipFinder.setAddresses(Arrays.asList("127.0.0.1:47500..47509"));
+
+        //kubernetes
+        String serviceName = System.getenv("IGNITE_K8S_SERVICE_NAME");
+        String namespace = System.getenv("IGNITE_K8S_NAMESPACE");
+        KubernetesConnectionConfiguration configuration = new KubernetesConnectionConfiguration();
+        if (serviceName != null) {
+            configuration.setServiceName(serviceName);
+        }
+        if (namespace != null) {
+            configuration.setNamespace(namespace);
+        }
+        TcpDiscoveryKubernetesIpFinder ipFinder = new TcpDiscoveryKubernetesIpFinder(configuration);
+
         discoverySpi.setIpFinder(ipFinder);
-
         cfg.setDiscoverySpi(discoverySpi);
 
-        // Optional: Enable peer class loading
         cfg.setPeerClassLoadingEnabled(true);
 
         return Ignition.start(cfg);

@@ -1,25 +1,31 @@
 # my_ignite_service
 
-## VM Options
--DIGNITE_INSTANCE_NAME=node2 --add-opens=java.base/jdk.internal.access=ALL-UNNAMED --add-opens=java.base/jdk.internal.misc=ALL-UNNAMED --add-opens=java.base/sun.nio.ch=ALL-UNNAMED --add-opens=java.base/sun.util.calendar=ALL-UNNAMED --add-opens=java.management/com.sun.jmx.mbeanserver=ALL-UNNAMED --add-opens=jdk.internal.jvmstat/sun.jvmstat.monitor=ALL-UNNAMED --add-opens=java.base/sun.reflect.generics.reflectiveObjects=ALL-UNNAMED --add-opens=jdk.management/com.sun.management.internal=ALL-UNNAMED --add-opens=java.base/java.io=ALL-UNNAMED --add-opens=java.base/java.nio=ALL-UNNAMED --add-opens=java.base/java.net=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.util.concurrent=ALL-UNNAMED --add-opens=java.base/java.util.concurrent.locks=ALL-UNNAMED --add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.invoke=ALL-UNNAMED --add-opens=java.base/java.math=ALL-UNNAMED --add-opens=java.sql/java.sql=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED --add-opens=java.base/java.time=ALL-UNNAMED --add-opens=java.base/java.text=ALL-UNNAMED --add-opens=java.management/sun.management=ALL-UNNAMED --add-opens java.desktop/java.awt.font=ALL-UNNAMED
+## Install orbstack
+https://orbstack.dev
 
+## Docker image build
+docker build -t my-ignite:1.0 .
 
-## App parameters
---server.port=8082
+## Start my-ignite
+kubectl apply -f k8s/myignite.yaml
 
-## Cache test
-### set
-curl --location 'localhost:8081/api/set' \
+## Test my-ignite cluster
+
+### Enter into pod1
+kubectl exec my-ignite-service-6444d6b8f6-jtqnr -it -- bash
+
+### Run curl to put cache
+curl --location 'localhost:8080/api/set' \
 --header 'Content-Type: application/json' \
 --data '{
 "key":"hello",
 "value":"ignite1"
 }'
 
-### get
-curl --location 'localhost:8082/api/get?key=hello'
+### Enter into pod2
+kubectl exec my-ignite-service-6444d6b8f6-m25wn -it -- bash
 
-
-
+### Run curl to get cache
+curl --location 'localhost:8080/api/get?key=hello'
 
 
