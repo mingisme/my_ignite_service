@@ -4,6 +4,11 @@ import org.apache.ignite.Ignite;
 import org.apache.ignite.IgniteCache;
 import org.springframework.web.bind.annotation.*;
 
+import javax.cache.expiry.AccessedExpiryPolicy;
+import javax.cache.expiry.Duration;
+import javax.cache.expiry.ExpiryPolicy;
+import java.util.concurrent.TimeUnit;
+
 @RestController
 @RequestMapping("/api")
 public class MyService {
@@ -17,6 +22,8 @@ public class MyService {
     @PostMapping("/set")
     public MyEntry setValue(@RequestBody MyEntry entry) {
         IgniteCache<String, String> cache = ignite.getOrCreateCache("testCache");
+        ExpiryPolicy slidingExpiry = new AccessedExpiryPolicy(new Duration(TimeUnit.HOURS, 1));
+        cache.withExpiryPolicy(slidingExpiry);
         cache.put(entry.key,entry.value);
         return entry;
     }
