@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 @RequestMapping("/api")
 public class MyService {
 
+    public static final String MY_CACHE = "myCache";
     private final Ignite ignite;
 
     public MyService(Ignite ignite) {
@@ -21,7 +22,7 @@ public class MyService {
 
     @PostMapping("/set")
     public MyEntry setValue(@RequestBody MyEntry entry) {
-        IgniteCache<String, String> cache = ignite.getOrCreateCache("testCache");
+        IgniteCache<String, String> cache = ignite.getOrCreateCache(MY_CACHE);
         ExpiryPolicy slidingExpiry = new AccessedExpiryPolicy(new Duration(TimeUnit.HOURS, 1));
         cache.withExpiryPolicy(slidingExpiry);
         cache.put(entry.key,entry.value);
@@ -30,7 +31,7 @@ public class MyService {
 
     @GetMapping("/get")
     public MyEntry getValue(@RequestParam String key){
-        IgniteCache<String, String> cache = ignite.getOrCreateCache("testCache");
+        IgniteCache<String, String> cache = ignite.getOrCreateCache(MY_CACHE);
         String value = cache.get(key);
         MyEntry myEntry = new MyEntry();
         myEntry.key = key;

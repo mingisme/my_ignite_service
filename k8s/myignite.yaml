@@ -11,6 +11,19 @@ spec:
       targetPort: 47500
 ---
 apiVersion: v1
+kind: Service
+metadata:
+  name: my-ignite-service-1
+spec:
+  selector:
+    app: my-ignite
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+  type: ClusterIP
+---
+apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: my-ignite-service-account
@@ -43,7 +56,7 @@ roleRef:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: my-ignite-service
+  name: my-ignite
 spec:
   replicas: 2
   selector:

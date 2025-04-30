@@ -28,4 +28,14 @@ kubectl exec my-ignite-service-6444d6b8f6-m25wn -it -- bash
 ### Run curl to get cache
 curl --location 'localhost:8080/api/get?key=hello'
 
+## Forward port 8080
+kubectl port-forward svc/my-ignite-service-1 8080:8080
+
+## Test monitor in web browser or with curl
+curl --location 'localhost:8080/monitor/nodes'
+
+curl --location 'localhost:8080/monitor/key-location?key=hello'
+
+
+
 
